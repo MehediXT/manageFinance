@@ -13,7 +13,9 @@ using namespace std;
 //8. export data
 //9. import data
 //10. user authentication
-//11. multi-user support
+//11. multi-user support            
+//12. data backup and restore
+//13. notifications and reminders
 int main(){
     cout << "Manage Finance yooo boy"<<endl;
 
