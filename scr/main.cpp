@@ -1,66 +1,148 @@
 #include <iostream>
+#include <vector>
+#include <string>
+using namespace std;
 
-// Project: Personal Finance Management System
-// File   : main.cpp
-// Purpose: Application entry point
+// ------------------------------
+// Transaction Class
+// ------------------------------
+class Transaction {
+public:
+    string type;      // Income or Expense
+    double amount;
+    string category;
+    string note;
 
-// -----------------------------------------------------------------------------
-// Pending Work / Roadmap (Prioritized)
-// -----------------------------------------------------------------------------
-// [P0 - Core MVP]
-// TODO: Implement data model for Transaction (income/expense) with type, amount, category, date, notes.
-// TODO: Implement storage layer (in-memory -> file persistence JSON/CSV).
-// TODO: Implement command interface (CLI menu loop).
-// TODO: Add income recording workflow.
-// TODO: Add expense recording workflow.
-// TODO: Compute and display current balance.
+    void inputTransaction() {
+        cout << "\n----- Add New Transaction -----\n";
+        cout << "Type (Income / Expense): ";
+        cin >> type;
+        cout << "Amount: ";
+        cin >> amount;
+        cout << "Category: ";
+        cin >> category;
+        cin.ignore();
+        cout << "Note: ";
+        getline(cin, note);
 
-// [P1 - Usability & Tracking]
-// TODO: Implement transaction history listing with filtering (date range, category, type).
-// TODO: Implement budget model (monthly / category-based).
-// TODO: Add budget status summary (remaining vs spent).
-// TODO: Add basic validation (negative amounts, empty descriptions).
+        // TODO: Add input validation (no negative amount, no empty type/category)
+        // TODO: Add date & time field for each transaction
+    }
 
-// [P2 - Reporting & Export]
-// TODO: Generate summary reports (daily / weekly / monthly aggregates).
-// TODO: Export data (CSV / JSON).
-// TODO: Import data with validation and duplicate detection.
+    void displayTransaction(int index) const {
+        cout << index + 1 << ". " << type
+             << " | Amount: " << amount
+             << " | Category: " << category
+             << " | Note: " << note << "\n";
 
-// [P3 - Security & Auth]
-// TODO: Add simple user authentication (username + hashed password).
-// TODO: Securely store credentials (salt + hash).
-// FIXME: Avoid storing sensitive data in plain text.
+        // TODO: Display date/time once added
+        // TODO: Add color formatting for better readability
+    }
+};
 
-// [P4 - Enhancements]
-// TODO: Category management (add/remove/rename).
-// TODO: Recurring transactions (e.g., subscriptions).
-// TODO: Multi-currency support (requires FX rate provider).
-// TODO: Simple analytics (top spend categories, trends).
-// TODO: Add configuration file for user preferences.
+// ------------------------------
+// Finance Manager Class
+// ------------------------------
+class FinanceManager {
+private:
+    vector<Transaction> transactions;
 
-// [Technical Debt / Improvements]
-// TODO: Introduce Logger (info/warn/error) abstraction.
-// TODO: Add unit tests (transactions, balance calc, budget logic).
-// TODO: Set up build system (CMake) and CI pipeline.
-// TODO: Separate code into modules (core/, io/, auth/, ui/).
-// FIXME: Replace using namespace std with explicit qualifiers.
-// NOTE: Consider future migration to database (SQLite) if scale grows.
+public:
+    void addTransaction() {
+        Transaction t;
+        t.inputTransaction();
+        transactions.push_back(t);
+        cout << "Transaction added successfully!\n";
 
-// [Stretch Goals]
-// TODO: Provide REST API layer.
-// TODO: Optional GUI (Qt / ImGui).
-// TODO: Encryption at rest for sensitive files.
+        // TODO: Save the new transaction to a file (for data persistence)
+    }
 
-// -----------------------------------------------------------------------------
-// Versioning
-// NOTE: Start semantic versioning after first stable CLI release (v0.1.0).
-// -----------------------------------------------------------------------------
+    void showTransactions() {
+        if (transactions.empty()) {
+            cout << "\nNo transactions yet.\n";
+            // TODO: Suggest user to add a new transaction
+            return;
+        }
 
+        cout << "\n----- Transaction History -----\n";
+        for (int i = 0; i < transactions.size(); i++) {
+            transactions[i].displayTransaction(i);
+        }
+
+        // TODO: Add sorting or filtering by type, category, or date
+        // TODO: Add search feature (search by keyword or category)
+    }
+
+    void showBalance() {
+        double income = 0, expense = 0;
+        for (auto &t : transactions) {
+            if (t.type == "Income" || t.type == "income")
+                income += t.amount;
+            else if (t.type == "Expense" || t.type == "expense")
+                expense += t.amount;
+        }
+
+        double balance = income - expense;
+
+        cout << "\n----- Balance Summary -----\n";
+        cout << "Total Income : " << income << endl;
+        cout << "Total Expense: " << expense << endl;
+        cout << "Current Balance: " << balance << endl;
+
+        // TODO: Add percentage breakdown (e.g., expenses as % of income)
+        // TODO: Add budget warning (if expenses > certain limit)
+    }
+
+    // Future planned updates
+    // -----------------------
+    // TODO: Implement editTransaction() to modify existing records
+    // TODO: Implement deleteTransaction() to remove a record
+    // TODO: Implement saveToFile() and loadFromFile() functions
+    // TODO: Add login system with username and password
+};
+
+// ------------------------------
+// Main Program
+// ------------------------------
 int main() {
-    std::cout << "Manage Finance starting..." << std::endl;
-    // TODO: Initialize subsystems (storage, config, auth).
-    // TODO: Enter main application loop (menu dispatcher).
-    // Placeholder:
-    std::cout << "TODO: Implement application loop." << std::endl;
+    FinanceManager manager;
+    int choice;
+
+    cout << "Welcome to Personal Finance Manager!\n";
+
+    while (true) {
+        cout << "\n==============================\n";
+        cout << "     Personal Finance App     \n";
+        cout << "==============================\n";
+        cout << "1. Add Transaction\n";
+        cout << "2. View All Transactions\n";
+        cout << "3. View Balance\n";
+        cout << "4. Exit\n";
+        cout << "Choose option: ";
+        cin >> choice;
+
+        if (choice == 1) {
+            manager.addTransaction();
+        }
+        else if (choice == 2) {
+            manager.showTransactions();
+        }
+        else if (choice == 3) {
+            manager.showBalance();
+        }
+        else if (choice == 4) {
+            cout << "\nThank you for using the app. Goodbye!\n";
+            break;
+        }
+        else {
+            cout << "Invalid choice, please try again.\n";
+        }
+
+        // TODO: Add option to save data after every operation
+        // TODO: Clear screen or pause for better user experience
+    }
+
+    // TODO: Auto-save all transactions before exit
+    // TODO: Add loading previous data on startup
     return 0;
 }
